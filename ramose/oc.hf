@@ -3,7 +3,7 @@
 #base http://localhost:8081
 #method get
 #title OpenCitations Meta + Index (RAMOSE v2 federation demo)
-#description Minimal RAMOSE v2 API. A single operation takes a DOI, retrieves the title from OpenCitations Meta, and joins the incoming citation count from OpenCitations Index on the shared OMID. The two endpoints are independent and nothing in Meta links to Index: the join happens in RAMOSE on the `?br` key.
+#description Minimal RAMOSE v2 API over two independent OpenCitations endpoints. The `/citations` operation takes a DOI, retrieves the title from OpenCitations Meta, and joins the incoming citation count from OpenCitations Index on the shared OMID. Nothing in Meta links to Index: the join happens in RAMOSE on the `?br` key. The `/incoming-citations` operation reuses the same join to list the citing resources one per row, paginated with RFC 8288 `Link` headers.
 #version 1.0.0
 #contacts arcangelo.massari@unibo.it
 #license ISC
@@ -14,14 +14,14 @@
 #doi str(.+)
 #method get
 #description Given a DOI, return its title (OpenCitations Meta) and incoming citation count (OpenCitations Index), joined on the OMID.
-#call /citations/10.1162/qss_a_00292
+#call /citations/10.1007/s11192-022-04367-w
 #field_type str(doi) str(title) str(br) int(oc_citation_count)
 #output_json [
     {
-        "doi": "10.1162/qss_a_00292",
-        "title": "OpenCitations Meta",
-        "br": "https://w3id.org/oc/meta/br/062104388184",
-        "oc_citation_count": "4"
+        "doi": "10.1007/s11192-022-04367-w",
+        "title": "Identifying And Correcting Invalid Citations Due To DOI Errors In Crossref Data",
+        "br": "https://w3id.org/oc/meta/br/061202127149",
+        "oc_citation_count": "6"
     }
 ]
 #sparql PREFIX datacite: <http://purl.org/spar/datacite/>
@@ -50,3 +50,41 @@ SELECT ?br (COUNT(?citing) AS ?oc_citation_count) WHERE {
        cito:hasCitingEntity ?citing .
 }
 GROUP BY ?br
+
+#url /incoming-citations/{doi}
+#type operation
+#doi str(.+)
+#method get
+#description Given a DOI, resolve its OMID in OpenCitations Meta and list the incoming citations from OpenCitations Index, one citing resource per row.
+#call /incoming-citations/10.1007/s11192-022-04367-w
+#field_type str(doi) str(br) str(citing)
+#output_json [
+    {
+        "doi": "10.1007/s11192-022-04367-w",
+        "br": "https://w3id.org/oc/meta/br/061202127149",
+        "citing": "https://w3id.org/oc/meta/br/0609403935"
+    }
+]
+#sparql PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?doi ?br WHERE {
+  VALUES ?doi_value { "[[doi]]" "[[doi]]"^^xsd:string }
+  ?id datacite:usesIdentifierScheme datacite:doi ;
+      literal:hasLiteralValue ?doi_value .
+  ?br datacite:hasIdentifier ?id .
+  BIND("[[doi]]" AS ?doi)
+}
+
+@@join ?br ?br type=left
+@@endpoint https://sparql.opencitations.net/index
+@@foreach ?br item wait=0
+PREFIX cito: <http://purl.org/spar/cito/>
+
+SELECT ?br ?citing WHERE {
+  BIND(<[[item]]> AS ?br)
+  ?cit a cito:Citation ;
+       cito:hasCitedEntity  ?br ;
+       cito:hasCitingEntity ?citing .
+}

@@ -4,7 +4,6 @@ import http.cookiejar
 import json
 import logging
 import os
-import sys
 import time
 import urllib.error
 import urllib.request
@@ -16,7 +15,9 @@ logger = logging.getLogger("register")
 BASE = os.environ["BASIL_BASE"]
 USER = "demo"
 PASS = "demo"  # noqa: S105
-STATE = Path("/state/api-id")
+ENDPOINT = "https://sparql.opencitations.net/meta"
+
+QUERIES = [("meta.rq", "api-id"), ("meta-rdf.rq", "api-id-rdf")]
 
 opener = urllib.request.build_opener(
     urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()),
@@ -41,14 +42,22 @@ def reachable(url: str) -> bool:
     return True
 
 
+def register(query: str) -> str:
+    resp = (
+        request(
+            f"{BASE}/basil/?endpoint={ENDPOINT}",
+            data=Path(f"/init/{query}").read_bytes(),
+            method="PUT",
+            headers={"Content-type": "application/sparql-query"},
+        )
+        .read()
+        .decode()
+    )
+    return json.loads(resp)["location"].rstrip("/").rsplit("/", 1)[-1]
+
+
 while not reachable(f"{BASE}/basil/"):
     time.sleep(3)
-
-if STATE.exists():
-    api_id = STATE.read_text().strip()
-    if reachable(f"{BASE}/basil/{api_id}/spec"):
-        logger.info("API already registered: %s", api_id)
-        sys.exit(0)
 
 with contextlib.suppress(urllib.error.HTTPError):
     request(
@@ -67,16 +76,13 @@ request(
     headers={"Content-type": "application/json"},
 )
 
-resp = (
-    request(
-        f"{BASE}/basil/?endpoint=https://sparql.opencitations.net/meta",
-        data=Path("/init/meta.rq").read_bytes(),
-        method="PUT",
-        headers={"Content-type": "application/sparql-query"},
-    )
-    .read()
-    .decode()
-)
-
-api_id = json.loads(resp)["location"].rstrip("/").rsplit("/", 1)[-1]
-STATE.write_text(api_id)
+for query, state_name in QUERIES:
+    state = Path(f"/state/{state_name}")
+    if state.exists():
+        api_id = state.read_text().strip()
+        if reachable(f"{BASE}/basil/{api_id}/spec"):
+            logger.info("%s already registered: %s", query, api_id)
+            continue
+    api_id = register(query)
+    state.write_text(api_id)
+    logger.info("%s registered: %s", query, api_id)
