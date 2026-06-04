@@ -26,26 +26,32 @@ The task: **join the title (Meta) with the citation count (Index) on the shared
 OMID**, two datasets with no link between them. All three tools take the same
 input, the DOI. How far each one gets is the point of the comparison.
 
-## What each tool is asked to do
-
-The rule: query **both** endpoints if the tool supports federation, **one** if
-it does not.
-
-| Tool | Port | Endpoints | What the demo shows |
-|---|---|---|---|
-| **RAMOSE v2** | 8081 | Meta **+** Index | one operation that joins the two result sets on the OMID |
-| **grlc** | 8082 | Meta **+** Index | two **independent** operations; grlc reaches both endpoints but cannot join them server-side |
-| **BASIL** | 8080 | Meta only | one API bound to a single endpoint; the Index citation count is not reachable in the same API |
-
 ## Run
 
 Requires Docker (with the Compose plugin). The BASIL image is built from source on first build and takes a few minutes.
 
+Start in background
+
 ```sh
 docker compose up -d --build
+```
+
+Read logs
+
+```sh
 docker compose logs -f
+```
+
+Stop
+
+```sh
 docker compose down
-docker compose down -v && rm -f basil/state/api-id basil/state/api-id-rdf   # full reset
+```
+
+Full reset
+
+```sh
+docker compose down -v && rm -f basil/state/api-id basil/state/api-id-rdf
 ```
 
 Once the stack is up, call the tools directly.
@@ -114,9 +120,17 @@ curl 'http://localhost:8082/api-local/swagger'
 
 ### Versioning
 
+The grlc versioning operation authenticates to the
+GitHub API, so it needs a token. Put it in a `.env` file in this directory and
+Compose passes it to grlc.
+
+```sh
+echo 'GITHUB_TOKEN=your_token_here' > .env
+```
+
 ```sh
 curl -H 'Accept: application/json' \
-  'http://localhost:8082/api-git/arcangelo7/sparql-api-comparison/subdir/grlc/queries/commit/11c068087bfde3c5a93258d896a6c9c87de0e6ad/article-meta?doi=10.1162/qss_a_00292'
+  'http://localhost:8082/api-git/arcangelo7/sparql-api-comparison/subdir/grlc/queries/commit/1872cd59b0524ce764060ba72f61d5e7aafe29a4/article-meta?doi=10.1007/s11192-022-04367-w'
 ```
 
 ## BASIL
