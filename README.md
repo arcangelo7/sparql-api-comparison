@@ -1,9 +1,9 @@
 # sparql-api-comparison
 
 A repository for testing server-side REST-API-over-SPARQL generators on the same
-task. It stands up minimal, real APIs for four tools, **RAMOSE v2**, **grlc**,
-**BASIL**, and **R4R**, and exercises each on the same OpenCitations lookup, so
-their functional differences can be observed.
+task. It stands up minimal, real APIs for five tools, **RAMOSE v2**, **grlc**,
+**BASIL**, **R4R**, and **CRAFTS**, and exercises each on the same OpenCitations
+lookup, so their functional differences can be observed.
 
 ## The test case
 
@@ -23,7 +23,7 @@ Endpoints:
 - Index: `https://sparql.opencitations.net/index`
 
 The task: **join the title (Meta) with the citation count (Index) on the shared
-OMID**, two datasets with no link between them. All four tools take the same
+OMID**, two datasets with no link between them. All five tools take the same
 input, the DOI. How far each one gets is the point of the comparison.
 
 ## Run
@@ -246,3 +246,46 @@ service (port 8084) is the same image with `API_USERS=demo:demo`.
 ```sh
 curl -u demo:demo 'http://localhost:8084/articles/061202127149'
 ```
+
+## CRAFTS
+
+### The join
+
+One resource call merges a resource's properties from both endpoints (title from
+Meta, citations from Index). The join is keyed by the resource IRI: the same IRI
+must identify the entity in both stores, and the client must supply it. You
+cannot make a join starting from the DOI.
+
+```sh
+curl -H 'Authorization: Bearer oc-read-token' \
+  'http://localhost:8085/apis/oc/query?id=articleByDoi&doi=10.1007/s11192-022-04367-w'
+```
+
+```sh
+curl -H 'Authorization: Bearer oc-read-token' \
+  'http://localhost:8085/apis/oc/resource?id=article&iri=https://w3id.org/oc/meta/br/061202127149'
+```
+
+### Output
+
+JSON only; CRAFTS does not negotiate other formats.
+
+### Pagination
+
+Not supported.
+
+### Versioning
+
+Not supported.
+
+### API description
+
+Swagger UI serving an OpenAPI 3.0 spec
+
+```sh
+curl 'http://localhost:8085/docs/'
+```
+
+### Authentication
+
+Every operation requires credentials
