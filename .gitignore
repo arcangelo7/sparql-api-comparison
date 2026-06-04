@@ -1,0 +1,4 @@
+basil/state/api-id
+*.log
+.venv/
+__pycache__/

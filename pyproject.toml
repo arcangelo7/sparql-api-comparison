@@ -1,0 +1,16 @@
+[project]
+name = "sparql-api-comparison"
+version = "1.0.0"
+requires-python = ">=3.13"
+
+[dependency-groups]
+dev = ["ruff", "pyright"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D",       # docstrings
+    "COM812",  # conflicts with the formatter
+    "INP001",  # standalone init scripts, not importable packages
+    "S310",    # URLs target controlled internal endpoints
+]

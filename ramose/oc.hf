@@ -1,0 +1,52 @@
+#url /api/v1
+#type api
+#base http://localhost:8081
+#method get
+#title OpenCitations Meta + Index (RAMOSE v2 federation demo)
+#description Minimal RAMOSE v2 API. A single operation takes a DOI, retrieves the title from OpenCitations Meta, and joins the incoming citation count from OpenCitations Index on the shared OMID. The two endpoints are independent and nothing in Meta links to Index: the join happens in RAMOSE on the `?br` key.
+#version 1.0.0
+#contacts arcangelo.massari@unibo.it
+#license ISC
+#endpoint https://sparql.opencitations.net/meta
+
+#url /citations/{doi}
+#type operation
+#doi str(.+)
+#method get
+#description Given a DOI, return its title (OpenCitations Meta) and incoming citation count (OpenCitations Index), joined on the OMID.
+#call /citations/10.1162/qss_a_00292
+#field_type str(doi) str(title) str(br) int(oc_citation_count)
+#output_json [
+    {
+        "doi": "10.1162/qss_a_00292",
+        "title": "OpenCitations Meta",
+        "br": "https://w3id.org/oc/meta/br/062104388184",
+        "oc_citation_count": "4"
+    }
+]
+#sparql PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?doi ?title ?br WHERE {
+  VALUES ?doi_value { "[[doi]]" "[[doi]]"^^xsd:string }
+  ?id datacite:usesIdentifierScheme datacite:doi ;
+      literal:hasLiteralValue ?doi_value .
+  ?br datacite:hasIdentifier ?id ;
+      dcterms:title ?title .
+  BIND("[[doi]]" AS ?doi)
+}
+
+@@join ?br ?br type=left
+@@endpoint https://sparql.opencitations.net/index
+@@foreach ?br item wait=0
+PREFIX cito: <http://purl.org/spar/cito/>
+
+SELECT ?br (COUNT(?citing) AS ?oc_citation_count) WHERE {
+  BIND(<[[item]]> AS ?br)
+  ?cit a cito:Citation ;
+       cito:hasCitedEntity  ?br ;
+       cito:hasCitingEntity ?citing .
+}
+GROUP BY ?br

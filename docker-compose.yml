@@ -1,0 +1,32 @@
+# Common lifecycle for the compared tools: `docker compose up -d` / `down`.
+# Each tool is one service exposing a minimal API over the OpenCitations
+# endpoints. Ports: RAMOSE 8081, grlc 8082, BASIL 8080.
+services:
+  ramose:
+    build: ./ramose
+    ports:
+      - "8081:8081"
+
+  grlc:
+    build: ./grlc
+    ports:
+      - "8082:8082"
+
+  basil:
+    build: ./basil
+    ports:
+      - "8080:8080"
+
+  # One-shot: registers the OpenCitations Meta API in the running BASIL server
+  basil-init:
+    image: python:3.13-alpine@sha256:420cd0bf0f3998275875e02ecd5808168cf0843cbb4d3c536432f729247b2acc
+    user: root
+    depends_on:
+      - basil
+    entrypoint: ["python", "/init/register.py"]
+    environment:
+      BASIL_BASE: http://basil:8080
+    volumes:
+      - ./basil/init:/init:ro
+      - ./basil/state:/state
+    restart: "no"
