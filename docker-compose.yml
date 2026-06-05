@@ -16,9 +16,6 @@ services:
     ports:
       - "8080:8080"
 
-  # R4R binds a single SPARQL endpoint for the whole server, so it reaches
-  # OpenCitations Meta only. GRAPH_IRI is blanked because R4R otherwise sends
-  # default-graph-uri=http://dbpedia.org, its built-in default.
   r4r:
     build: ./r4r
     ports:
@@ -48,7 +45,11 @@ services:
     ports:
       - "8086:8086"
 
-  # One-shot: registers the OpenCitations Meta API in the running BASIL server
+  oba:
+    build: ./oba
+    ports:
+      - "8087:8080"
+
   basil-init:
     image: python:3.13-alpine@sha256:420cd0bf0f3998275875e02ecd5808168cf0843cbb4d3c536432f729247b2acc
     user: root

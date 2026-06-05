@@ -1,9 +1,9 @@
 # sparql-api-comparison
 
 A repository for testing server-side REST-API-over-SPARQL generators on the same
-task. It stands up minimal, real APIs for six tools, **RAMOSE v2**, **grlc**,
-**BASIL**, **R4R**, **CRAFTS**, and **RDFProxy**, and exercises each on the same
-OpenCitations lookup, so their functional differences can be observed.
+task. It stands up minimal, real APIs for seven tools, **RAMOSE v2**, **grlc**,
+**BASIL**, **R4R**, **CRAFTS**, **RDFProxy**, and **OBA**, and exercises each on
+the same OpenCitations lookup, so their functional differences can be observed.
 
 ## The test case
 
@@ -23,7 +23,7 @@ Endpoints:
 - Index: `https://sparql.opencitations.net/index`
 
 The task: **join the title (Meta) with the citation count (Index) on the shared
-OMID**, two datasets with no link between them. All six tools take the same
+OMID**, two datasets with no link between them. All seven tools take the same
 input, the DOI. How far each one gets is the point of the comparison.
 
 ## Run
@@ -329,3 +329,44 @@ The Swagger UI (and ReDoc) render that description in the browser:
 
 Not supported by RDFProxy itself; FastAPI's security utilities would have to be
 added by hand.
+
+## OBA
+
+### The join
+
+OBA binds a single endpoint, so it answers from Meta only and cannot reach the
+citation count in Index.
+
+```sh
+curl 'http://localhost:8087/v1.0.0/articles?label=10.1007/s11192-022-04367-w'
+```
+
+### Output
+
+JSON only. OBA fetches JSON-LD from the endpoint, frames it with the generated
+context, then strips `@context`, so consumers see ordinary JSON.
+
+### Pagination
+
+```sh
+curl -i 'http://localhost:8087/v1.0.0/journalarticles?page=1&per_page=2'
+```
+
+### Versioning
+
+The version is carried in the base path (`/v1.0.0`), derived from `oba/config.yaml`.
+
+### API description
+
+OBA emits an OpenAPI 3.0 spec.
+
+```sh
+curl 'http://localhost:8087/v1.0.0/openapi.json'
+```
+
+### Authentication
+
+When
+write paths are enabled, only the write methods carry a Bearer requirement;
+reads stay open. OBA's login flow verifies credentials against Firebase (the
+only provider).
