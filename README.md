@@ -1,10 +1,10 @@
 # sparql-api-comparison
 
 A repository for testing server-side REST-API-over-SPARQL generators on the same
-task. It stands up minimal, real APIs for eight tools, **RAMOSE v2**, **grlc**,
-**BASIL**, **R4R**, **CRAFTS**, **RDFProxy**, **OBA**, and **Elda**, and
-exercises each on the same OpenCitations lookup, so their functional differences
-can be observed.
+task. It stands up minimal, real APIs for nine tools, **RAMOSE v2**, **grlc**,
+**BASIL**, **R4R**, **CRAFTS**, **RDFProxy**, **OBA**, **Elda**, and **Walder**,
+and exercises each on the same OpenCitations lookup, so their functional
+differences can be observed.
 
 ## The test case
 
@@ -24,7 +24,7 @@ Endpoints:
 - Index: `https://sparql.opencitations.net/index`
 
 The task: **join the title (Meta) with the citation count (Index) on the shared
-OMID**, two datasets with no link between them. All eight tools take the same
+OMID**, two datasets with no link between them. All nine tools take the same
 input, the DOI. How far each one gets is the point of the comparison.
 
 ## Run
@@ -431,3 +431,36 @@ policies, is visible at a control endpoint.
 ```sh
 curl 'http://localhost:8088/control/show-cache'
 ```
+
+## Walder
+
+Walder cannot be tested because of a problem in the configuration of the OpenCitations SPARQL endpoints.
+
+> TODO: fix the OpenCitations Meta and Index endpoints to return a SPARQL service
+> description on a bare `GET` (instead of the HTML query form), so that Comunica's
+> auto-detection recognises them as SPARQL endpoints.
+
+### The join
+
+TODO
+
+### Output
+
+TODO
+
+### Pagination
+
+Not supported.
+
+### Versioning
+
+Not supported.
+
+### API description
+
+Walder does not serve an OpenAPI specification or a Swagger UI of its routes; the
+config is written in the OpenAPI structure but no derived spec is exposed.
+
+### Authentication
+
+Not supported. There are no write operations.
