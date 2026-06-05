@@ -43,6 +43,11 @@ services:
     ports:
       - "8085:8888"
 
+  rdfproxy:
+    build: ./rdfproxy
+    ports:
+      - "8086:8086"
+
   # One-shot: registers the OpenCitations Meta API in the running BASIL server
   basil-init:
     image: python:3.13-alpine@sha256:420cd0bf0f3998275875e02ecd5808168cf0843cbb4d3c536432f729247b2acc
