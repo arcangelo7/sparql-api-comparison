@@ -43,6 +43,12 @@ oc:api a api:API
       ; api:mimeType "application/atom+xml"
       ; elda:feedTitle "OpenCitations Meta feed"
       ]
+  ; api:formatter
+      [a api:XsltFormatter
+      ; api:name "skg"
+      ; api:mimeType "application/json"
+      ; api:stylesheet "xslt/skg.xsl"
+      ]
   .
 
 oc:articles a api:ListEndpoint

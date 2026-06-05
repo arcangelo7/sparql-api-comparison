@@ -384,9 +384,19 @@ curl 'http://localhost:8088/oc/articles?doi=10.1007/s11192-022-04367-w'
 
 ### Output
 
+The built-ins cover JSON, JSON-LD, RDF/XML, Turtle, XML, HTML, and Atom.
+
 ```sh
 curl 'http://localhost:8088/oc/articles.ttl?doi=10.1007/s11192-022-04367-w'
 curl 'http://localhost:8088/oc/articles.json-ld?doi=10.1007/s11192-022-04367-w'
+```
+
+`elda/xslt/skg.xsl` adds a
+minimal, SKG-IF(ish) JSON view wired in
+`elda/oc.ttl` as the `skg` format.
+
+```sh
+curl 'http://localhost:8088/oc/articles.skg?doi=10.1007/s11192-022-04367-w'
 ```
 
 ### Pagination
