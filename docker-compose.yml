@@ -50,6 +50,11 @@ services:
     ports:
       - "8087:8080"
 
+  elda:
+    build: ./elda
+    ports:
+      - "8088:8080"
+
   basil-init:
     image: python:3.13-alpine@sha256:420cd0bf0f3998275875e02ecd5808168cf0843cbb4d3c536432f729247b2acc
     user: root

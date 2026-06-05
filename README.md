@@ -1,9 +1,10 @@
 # sparql-api-comparison
 
 A repository for testing server-side REST-API-over-SPARQL generators on the same
-task. It stands up minimal, real APIs for seven tools, **RAMOSE v2**, **grlc**,
-**BASIL**, **R4R**, **CRAFTS**, **RDFProxy**, and **OBA**, and exercises each on
-the same OpenCitations lookup, so their functional differences can be observed.
+task. It stands up minimal, real APIs for eight tools, **RAMOSE v2**, **grlc**,
+**BASIL**, **R4R**, **CRAFTS**, **RDFProxy**, **OBA**, and **Elda**, and
+exercises each on the same OpenCitations lookup, so their functional differences
+can be observed.
 
 ## The test case
 
@@ -23,7 +24,7 @@ Endpoints:
 - Index: `https://sparql.opencitations.net/index`
 
 The task: **join the title (Meta) with the citation count (Index) on the shared
-OMID**, two datasets with no link between them. All seven tools take the same
+OMID**, two datasets with no link between them. All eight tools take the same
 input, the DOI. How far each one gets is the point of the comparison.
 
 ## Run
@@ -370,3 +371,53 @@ When
 write paths are enabled, only the write methods carry a Bearer requirement;
 reads stay open. OBA's login flow verifies credentials against Firebase (the
 only provider).
+
+## Elda
+
+### The join
+
+Elda binds a single endpoint per API, so it answers from Meta only.
+
+```sh
+curl 'http://localhost:8088/oc/articles?doi=10.1007/s11192-022-04367-w'
+```
+
+### Output
+
+```sh
+curl 'http://localhost:8088/oc/articles.ttl?doi=10.1007/s11192-022-04367-w'
+curl 'http://localhost:8088/oc/articles.json-ld?doi=10.1007/s11192-022-04367-w'
+```
+
+### Pagination
+
+```sh
+curl 'http://localhost:8088/oc/authors?article=https://w3id.org/oc/meta/br/061202127149&_page=0&_pageSize=2'
+```
+
+### Versioning
+
+Not supported.
+
+### API description
+
+Elda emits no OpenAPI or Swagger description. The interface is described by the
+LDA metadata.
+
+```sh
+curl 'http://localhost:8088/oc/articles.ttl?doi=10.1007/s11192-022-04367-w&_metadata=all'
+```
+
+### Authentication
+
+Elda reads only, and its authentication protects the upstream endpoint, not the API's consumers.
+
+### Caching
+
+Per-endpoint, configured with `elda:cacheExpiryTime`. The cache state, including
+hit and miss counts and the `perma-cache`/`limit-entries`/`limit-triples`
+policies, is visible at a control endpoint.
+
+```sh
+curl 'http://localhost:8088/control/show-cache'
+```
