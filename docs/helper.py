@@ -39,14 +39,15 @@ def call(url, *, method="GET", headers=None, data=None, basic_auth=None, show_he
         print(f"... ({len(lines) - max_lines} more lines)")
 
 
-def embed_swagger(spec, *, height=600):
+def embed_swagger(spec, *, base_url, height=600):
     page = (
         '<!doctype html><html><head>'
+        '<base href="%s">'
         '<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css">'
         '</head><body><div id="swagger-ui"></div>'
         '<script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>'
         '<script>window.ui = SwaggerUIBundle({spec: %s, dom_id: "#swagger-ui"});</script>'
-        '</body></html>' % json.dumps(spec)
+        '</body></html>' % (base_url, json.dumps(spec))
     )
     src = "data:text/html;base64," + base64.b64encode(page.encode()).decode()
     return IFrame(src, width="100%", height=height)
