@@ -4,7 +4,20 @@ version = "1.0.0"
 requires-python = ">=3.13"
 
 [dependency-groups]
-dev = ["ruff", "pyright", "rdfproxy==0.10.1", "fastapi[standard]==0.136.3"]
+dev = [
+    "ruff",
+    "pyright",
+    "rdfproxy==0.10.1",
+    "fastapi[standard]==0.136.3",
+    "jupyter-book~=1.0.0",
+    "requests>=2.34.2",
+]
+
+[tool.ruff]
+extend-exclude = ["docs"]
+
+[tool.pyright]
+exclude = ["docs"]
 
 [tool.ruff.lint]
 select = ["ALL"]

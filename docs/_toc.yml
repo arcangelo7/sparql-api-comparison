@@ -1,0 +1,12 @@
+format: jb-book
+root: intro
+chapters:
+  - file: ramose
+  - file: grlc
+  - file: basil
+  - file: r4r
+  - file: crafts
+  - file: rdfproxy
+  - file: oba
+  - file: elda
+  - file: walder
