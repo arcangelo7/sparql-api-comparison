@@ -24,22 +24,22 @@ The task: **join the title (Meta) with the citation count (Index) on the shared 
 
 Functional comparison of the generators. `✓` supported, `✗` not supported, `∼` partial.
 
-| Dimension | RAMOSE v1 | RAMOSE v2 | grlc | BASIL | OBA | R4R | CRAFTS | RDFProxy | Elda | Walder |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Interface description language | HTML | OpenAPI 3.1, HTML | OpenAPI 2.0 | Swagger 1.2 | OpenAPI 3.0 | --- | OpenAPI 3.0 | OpenAPI 3.1 | LDA spec | OpenAPI 3.0 |
-| Input | SPARQL | SPARQL | SPARQL | SPARQL | OWL ontology | SPARQL, templates | JSON config | SPARQL, model | RDF spec | GraphQL-LD, SPARQL |
-| Output | CSV, JSON | Any | endpoint-dependent | XML, JSON, CSV, RDF | JSON | JSON | JSON | JSON | Any | HTML, JSON-LD, RDF |
-| Operations | GET, POST | CRUD | GET, POST | GET, POST | CRUD | GET | CRUD, PATCH | GET | GET | GET |
-| Configuration format | .hf | .hf | .rq, YAML | REST API | YAML | .sparql, .vm | JSON | Pydantic model | RDF/Turtle | YAML |
-| Configurable queries | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Authentication | ✗ | Bearer | ✗ | Basic | Bearer | Basic | Basic, Bearer | ✗ | ✗ | ✗ |
-| Resources | S, M | S, M, N | S, M, N | S, M | S, M, N | S, M, N | S, M, N | S, M, N | S, M, N | S, M, N |
-| Versioning | ✓ | ✓ | ✓ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
-| Control over JSON | ✓ | ✓ | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Multiple endpoints | ∼ | ✓ | ✓ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✓ |
-| Non-RDF sources | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
-| Join across queries | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ∼ | ✗ | ✗ | ∼ |
-| Pagination | ✗ | ✓ | ✓ | ✗ | ∼ | ∼ | ✗ | ✓ | ✓ | ∼ |
-| Caching | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✓ | ✓ |
+| Dimension | RAMOSE | grlc | BASIL | OBA | R4R | CRAFTS | RDFProxy | Elda | Walder |
+|---|---|---|---|---|---|---|---|---|---|
+| Interface description language | OpenAPI 3.1, HTML | OpenAPI 2.0 | Swagger 1.2 | OpenAPI 3.0 | --- | OpenAPI 3.0 | OpenAPI 3.1 | LDA spec | OpenAPI 3.0 |
+| Input | SPARQL | SPARQL | SPARQL | OWL ontology | SPARQL, templates | JSON config | SPARQL, model | RDF spec | GraphQL-LD, SPARQL |
+| Output | Any | endpoint-dependent | XML, JSON, CSV, RDF | JSON | JSON | JSON | JSON | Any | HTML, JSON-LD, RDF |
+| Operations | CRUD | GET, POST | GET, POST | CRUD | GET | CRUD, PATCH | GET | GET | GET |
+| Configuration format | .hf | .rq, YAML | REST API | YAML | .sparql, .vm | JSON | Pydantic model | RDF/Turtle | YAML |
+| Configurable queries | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Authentication | Bearer | ✗ | Basic | Bearer | Basic | Basic, Bearer | ✗ | ✗ | ✗ |
+| Resources | S, M, N | S, M, N | S, M | S, M, N | S, M, N | S, M, N | S, M, N | S, M, N | S, M, N |
+| Versioning | ✓ | ✓ | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| Control over JSON | ✓ | ✓ | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Multiple endpoints | ✓ | ✓ | ✗ | ✗ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| Non-RDF sources | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| Join across queries | ✓ | ✗ | ✗ | ✗ | ✗ | ∼ | ✗ | ✗ | ∼ |
+| Pagination | ✓ | ✓ | ✗ | ∼ | ∼ | ✗ | ✓ | ✓ | ∼ |
+| Caching | ✓ | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✓ | ✓ |
 
 Resources: `S` single resource, `M` flat collection, `N` nested resources. Pagination counts as supported only when all three are present: a request parameter for a bounded window, navigation to adjacent pages, and a termination signal. OBA, R4R, and Walder offer only windowing, hence `∼`.

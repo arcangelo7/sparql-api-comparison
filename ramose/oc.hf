@@ -2,8 +2,8 @@
 #type api
 #base http://localhost:8081
 #method get
-#title OpenCitations Meta + Index (RAMOSE v2 federation demo)
-#description Minimal RAMOSE v2 API over two independent OpenCitations endpoints. The `/citations` operation takes a DOI, retrieves the title from OpenCitations Meta, and joins the incoming citation count from OpenCitations Index on the shared OMID. Nothing in Meta links to Index: the join happens in RAMOSE on the `?br` key. The `/incoming-citations` operation reuses the same join to list the citing resources one per row, paginated with RFC 8288 `Link` headers.
+#title OpenCitations Meta + Index (RAMOSE federation demo)
+#description Minimal RAMOSE API over two independent OpenCitations endpoints. The `/citations` operation takes a DOI, retrieves the title from OpenCitations Meta, and joins the incoming citation count from OpenCitations Index on the shared OMID. Nothing in Meta links to Index: the join happens in RAMOSE on the `?br` key. The `/incoming-citations` operation reuses the same join to list the citing resources one per row, paginated with RFC 8288 `Link` headers.
 #version 1.0.0
 #contacts arcangelo.massari@unibo.it
 #license ISC
@@ -87,4 +87,32 @@ SELECT ?br ?citing WHERE {
   ?cit a cito:Citation ;
        cito:hasCitedEntity  ?br ;
        cito:hasCitingEntity ?citing .
+}
+
+#url /protected/{doi}
+#type operation
+#doi str(.+)
+#method get
+#auth required
+#description Given a DOI, return its title from OpenCitations Meta. Protected by a bearer token, to showcase authentication.
+#call /protected/10.1007/s11192-022-04367-w
+#field_type str(doi) str(title)
+#output_json [
+    {
+        "doi": "10.1007/s11192-022-04367-w",
+        "title": "Identifying And Correcting Invalid Citations Due To DOI Errors In Crossref Data"
+    }
+]
+#sparql PREFIX datacite: <http://purl.org/spar/datacite/>
+PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?doi ?title WHERE {
+  VALUES ?doi_value { "[[doi]]" "[[doi]]"^^xsd:string }
+  ?id datacite:usesIdentifierScheme datacite:doi ;
+      literal:hasLiteralValue ?doi_value .
+  ?br datacite:hasIdentifier ?id ;
+      dcterms:title ?title .
+  BIND("[[doi]]" AS ?doi)
 }
